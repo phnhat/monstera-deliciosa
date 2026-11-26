@@ -6,7 +6,7 @@ Help-center articles → clean Markdown → OpenAI vector store, kept in sync by
 
 ![OptiBot in the OpenAI Playground answering "How do I add a YouTube video?"](docs/screenshot.png)
 
-*OptiBot in the Playground: `gpt-6.2-astra` with File Search and the system prompt verbatim. The boxes after step 2 are the model's raw inline citation markers ([why](docs/DESIGN.md#assistant)).*
+*OptiBot, saved as a Playground prompt: `gpt-6.2-astra` with File Search and the system prompt verbatim. The boxes after step 2 are the model's raw inline citation markers ([why](docs/DESIGN.md#assistant)).*
 
 ## Setup & run locally
 ```bash
