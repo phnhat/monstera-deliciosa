@@ -1,6 +1,7 @@
 """Pipeline phases. Each phase reads the previous phase's files from disk and
-writes its own, so phases can run in one process (`main.py`) or as separate
-CI jobs that hand files to each other as artifacts.
+writes its own, so phases can run in one process (`python main.py`) or one at
+a time (`python main.py <phase>`); the daily workflow runs each phase as its
+own step, so a failure shows which phase broke.
 
     fetch    Zendesk API            -> out/raw/articles.json
     convert  raw articles           -> <OUTPUT_DIR>/<slug>.md

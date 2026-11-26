@@ -6,7 +6,7 @@ Runs once and exits: 0 on success, 1 on any failure.
     python main.py --dry-run        # fetch -> convert -> chunk only; no API key needed
     python main.py --mark-stale 3   # demo: mark 3 synced articles stale first, so this run shows updated=3
     python main.py <phase>          # one phase: fetch | convert | chunk | plan | upload
-                                    # (the daily CI workflow runs each phase as its own job)
+                                    # (the daily CI workflow runs each phase as its own step)
 """
 
 from __future__ import annotations
