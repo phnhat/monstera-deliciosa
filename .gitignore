@@ -1,0 +1,12 @@
+# secrets
+.env
+# local env / caches
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# run outputs (chunks, reports, logs) — published as CI artifacts instead
+out/
+# assignment brief (kept local on purpose)
+goal.md
+.DS_Store
