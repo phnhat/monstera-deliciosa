@@ -55,6 +55,18 @@ The image is a multi-stage build, from a `python:3.13-slim` builder to a `distro
 ## Daily job
 `.github/workflows/daily-sync.yml` builds the image and runs it daily at 06:17 UTC, plus manual runs. It needs the repo secret `OPENAI_API_KEY` and the repo variable `VECTOR_STORE_ID`. GitHub pauses scheduled workflows in public repos after 60 days without commits.
 
+First runs: the initial backfill, then a demo of `updated`.
+
+| Run | added | updated | skipped | deferred | chunks embedded |
+|---|---|---|---|---|---|
+| [1](https://github.com/phnhat/monstera-deliciosa/actions/runs/45815590893) | 100 | 0 | 0 | 296 | 280 |
+| [2](https://github.com/phnhat/monstera-deliciosa/actions/runs/45816092830) | 100 | 0 | 100 | 196 | 271 |
+| [3](https://github.com/phnhat/monstera-deliciosa/actions/runs/45816618603) | 100 | 0 | 200 | 96 | 277 |
+| [4](https://github.com/phnhat/monstera-deliciosa/actions/runs/45817204477) | 96 | 0 | 300 | 0 | 507 |
+| [5](https://github.com/phnhat/monstera-deliciosa/actions/runs/45817990308) (`mark_stale=3` demo) | 0 | 3 | 393 | 0 | 13 |
+
+The store now holds 396 articles / 1,335 chunks.
+
 ## Assistant
 OptiBot is a Playground prompt with File Search attached to the vector store and this system prompt, verbatim:
 ```
