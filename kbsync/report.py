@@ -13,7 +13,7 @@ COUNT_KEYS = ("added", "updated", "skipped", "removed", "deferred", "failed",
 
 @dataclass
 class RunReport:
-    started_at: str
+    generated_at: str = ""
     vector_store_id: str | None = None
     dry_run: bool = False
     mark_stale: int = 0
@@ -22,8 +22,6 @@ class RunReport:
     counts: dict[str, int] = field(default_factory=lambda: dict.fromkeys(COUNT_KEYS, 0))
     details: dict[str, object] = field(default_factory=dict)
     removal_guard_tripped: bool = False
-    finished_at: str | None = None
-    duration_s: float | None = None
 
     def summary_line(self) -> str:
         counts = " ".join(f"{k}={self.counts[k]}" for k in COUNT_KEYS)
@@ -41,7 +39,7 @@ class RunReport:
                          "so `updated` reflects that demo, not an upstream edit.")
         if self.removal_guard_tripped:
             notes.append("> **Removal guard tripped:** fetch returned far fewer articles than the store holds; deletions skipped.")
-        return (f"### KB sync — {self.started_at}\n\n"
+        return (f"### KB sync result — {self.generated_at}\n\n"
                 f"Scraped **{self.articles_scraped}** articles → **{self.chunks_built}** chunks. "
                 f"Vector store `{self.vector_store_id or '-'}`.\n\n"
                 + ("\n\n".join(notes) + "\n\n" if notes else "")
