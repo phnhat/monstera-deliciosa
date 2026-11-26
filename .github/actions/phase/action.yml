@@ -14,7 +14,9 @@ runs:
       env:
         ARGS: ${{ inputs.args }}
       run: |
-        mkdir -p out && chmod -R a+rwX out   # container runs as non-root (uid 65532)
+        # The container runs as non-root (uid 65532): make out/ itself writable for it.
+        # Not recursive: files inside were written by earlier phases as that same uid.
+        mkdir -p out && chmod a+rwx out
         docker run --rm \
           -e OPENAI_API_KEY -e VECTOR_STORE_ID -e MAX_NEW_PER_RUN \
           -e OUTPUT_DIR=/app/out/articles \
