@@ -1,9 +1,9 @@
 name: daily-sync
 
-# Each pipeline phase is its own job, so the run graph shows where a run failed
-# and how long each phase took. Phases hand files to each other as artifacts
-# (raw articles -> Markdown -> chunks -> plan -> report); every job runs the same
-# Docker image, built once by the first job.
+# One job, one step per pipeline phase: each phase gets its own status and
+# timing in the run view, so a failure shows exactly which phase broke.
+# Phases are short and strictly sequential, so steps (not separate jobs)
+# avoid per-job runner start-up and passing the image between machines.
 
 on:
   schedule:
@@ -26,126 +26,52 @@ env:
   MAX_NEW_PER_RUN: ${{ vars.MAX_NEW_PER_RUN || '100' }}
 
 jobs:
-  build:
-    name: Build image
+  sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
         with:
-          persist-credentials: false # the jobs never push; don't leave a token in .git/config
-      - name: Build
+          persist-credentials: false # the job never pushes; don't leave a token in .git/config
+
+      - name: Build image
         run: docker build -t kbsync .
-      - name: Export image
-        run: docker save kbsync | gzip > kbsync.tar.gz
-      - uses: actions/upload-artifact@v7
-        with:
-          name: docker-image
-          path: kbsync.tar.gz
-          compression-level: 0 # already gzipped
-          retention-days: 1
 
-  fetch:
-    name: Fetch articles
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-        with: { persist-credentials: false }
-      - uses: ./.github/actions/phase
-        with: { args: fetch }
-      - uses: actions/upload-artifact@v7
+      - name: Fetch articles
+        uses: ./.github/actions/phase
         with:
-          name: 1-raw-articles
-          path: |
-            out/raw/
-            out/fetch.log
+          args: fetch
 
-  convert:
-    name: Convert to Markdown
-    needs: fetch
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-        with: { persist-credentials: false }
-      - uses: actions/download-artifact@v8
-        with: { name: 1-raw-articles, path: out }
-      - uses: ./.github/actions/phase
-        with: { args: convert }
-      - uses: actions/upload-artifact@v7
+      - name: Convert to Markdown
+        uses: ./.github/actions/phase
         with:
-          name: 2-markdown
-          path: |
-            out/articles/
-            out/convert.log
+          args: convert
 
-  chunk:
-    name: Chunk
-    needs: convert
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-        with: { persist-credentials: false }
-      - uses: actions/download-artifact@v8
-        with: { name: 1-raw-articles, path: out }
-      - uses: actions/download-artifact@v8
-        with: { name: 2-markdown, path: out }
-      - uses: ./.github/actions/phase
-        with: { args: chunk }
-      - uses: actions/upload-artifact@v7
+      - name: Chunk
+        uses: ./.github/actions/phase
         with:
-          name: 3-chunks
-          path: |
-            out/chunks/
-            out/chunk.log
+          args: chunk
 
-  compare:
-    name: Compare with vector store
-    needs: chunk
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      VECTOR_STORE_ID: ${{ vars.VECTOR_STORE_ID }}
-    steps:
-      - uses: actions/checkout@v7
-        with: { persist-credentials: false }
-      - uses: actions/download-artifact@v8
-        with: { name: 3-chunks, path: out }
-      - uses: ./.github/actions/phase
+      - name: Compare with vector store
+        uses: ./.github/actions/phase
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          VECTOR_STORE_ID: ${{ vars.VECTOR_STORE_ID }}
         with:
           args: plan --mark-stale ${{ inputs.mark_stale || 0 }}
-      - uses: actions/upload-artifact@v7
-        with:
-          name: 4-plan
-          path: |
-            out/plan.json
-            out/plan.log
 
-  upload:
-    name: Upload delta
-    needs: compare
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      VECTOR_STORE_ID: ${{ vars.VECTOR_STORE_ID }}
-    steps:
-      - uses: actions/checkout@v7
-        with: { persist-credentials: false }
-      - uses: actions/download-artifact@v8
-        with: { name: 3-chunks, path: out }
-      - uses: actions/download-artifact@v8
-        with: { name: 4-plan, path: out }
-      - uses: ./.github/actions/phase
-        with: { args: upload }
-      - uses: actions/upload-artifact@v7
-        if: always()
+      - name: Upload delta
+        uses: ./.github/actions/phase
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          VECTOR_STORE_ID: ${{ vars.VECTOR_STORE_ID }}
         with:
-          name: 5-run-report
-          path: |
-            out/run_report.json
-            out/upload.log
+          args: upload
+
+      - name: Upload run artifact (raw, Markdown, chunks, plan, report, logs)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kb-sync-run-${{ github.run_number }}
+          path: out/
+          retention-days: 30

@@ -1,5 +1,5 @@
 name: Run pipeline phase
-description: Load the image built by the build job and run one main.py phase with ./out mounted.
+description: Run one main.py phase in the kbsync image with ./out mounted, then publish its summary.
 
 inputs:
   args:
@@ -9,16 +9,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Download image
-      uses: actions/download-artifact@v8
-      with:
-        name: docker-image
-        path: ${{ runner.temp }}/image
-
-    - name: Load image
-      shell: bash
-      run: docker load --input "$RUNNER_TEMP/image/kbsync.tar.gz"
-
     - name: Run main.py ${{ inputs.args }}
       shell: bash
       env:

@@ -2,7 +2,7 @@
 
 Support-center articles → clean Markdown → OpenAI vector store, kept in sync by a daily job. It backs **OptiBot**, an assistant that answers only from the docs and cites article URLs.
 
-**Daily job logs:** [GitHub Actions runs](https://github.com/phnhat/monstera-deliciosa/actions/workflows/daily-sync.yml). Each run's summary shows added / updated / skipped counts. Its artifacts (`1-raw-articles` … `5-run-report`) hold each phase's output and log, ending with `run_report.json`.
+**Daily job logs:** [GitHub Actions runs](https://github.com/phnhat/monstera-deliciosa/actions/workflows/daily-sync.yml). Each run's summary shows added / updated / skipped counts. Its `kb-sync-run-N` artifact holds each phase's output and log: raw articles, Markdown, chunks, `plan.json` and `run_report.json`.
 
 ## How it works
 1. **Scrape** (`kbsync/zendesk.py`): every published article via the Zendesk Help Center API. The API returns article bodies only, so site nav, headers, footers and ads never enter the pipeline.
@@ -56,15 +56,15 @@ docker run --rm -e API_KEY=sk-... kbsync    # same as: kbsync main.py
 The image is a multi-stage build, from a `python:3.13-slim` builder to a `distroless/python3` runtime: 155 MB, no shell, non-root.
 
 ## Daily job
-`.github/workflows/daily-sync.yml` runs daily at 06:17 UTC, plus manual runs. Each phase is its own job, so the run graph shows which phase failed and how long each took:
+`.github/workflows/daily-sync.yml` runs daily at 06:17 UTC, plus manual runs. It is one job with one step per phase, so the run view shows which phase failed and how long each took:
 
 ```
 Build image → Fetch articles → Convert to Markdown → Chunk → Compare with vector store → Upload delta
 ```
 
-The image is built once and handed to the later jobs. Phase outputs pass between jobs as artifacts. The workflow needs the repo secret `OPENAI_API_KEY` and the repo variable `VECTOR_STORE_ID`. GitHub pauses scheduled workflows in public repos after 60 days without commits.
+The phases take seconds each and run strictly in order, so they are steps rather than separate jobs: no per-job runner start-up, and no passing the image between machines. The workflow needs the repo secret `OPENAI_API_KEY` and the repo variable `VECTOR_STORE_ID`. GitHub pauses scheduled workflows in public repos after 60 days without commits.
 
-Runs so far: the initial backfill, a demo of `updated`, then the first run of the 6-job workflow (nothing changed upstream, so everything was skipped). Runs 1–5 ran as a single job.
+Runs so far: the initial backfill, a demo of `updated`, then a run where nothing had changed upstream, so everything was skipped.
 
 | Run | added | updated | skipped | deferred | chunks embedded |
 |---|---|---|---|---|---|
@@ -73,7 +73,7 @@ Runs so far: the initial backfill, a demo of `updated`, then the first run of th
 | [3](https://github.com/phnhat/monstera-deliciosa/actions/runs/45816618603) | 100 | 0 | 200 | 96 | 277 |
 | [4](https://github.com/phnhat/monstera-deliciosa/actions/runs/45817204477) | 96 | 0 | 300 | 0 | 507 |
 | [5](https://github.com/phnhat/monstera-deliciosa/actions/runs/45817990308) (`mark_stale=3` demo) | 0 | 3 | 393 | 0 | 13 |
-| [6](https://github.com/phnhat/monstera-deliciosa/actions/runs/45829964289) (6-job workflow) | 0 | 0 | 396 | 0 | 0 |
+| [6](https://github.com/phnhat/monstera-deliciosa/actions/runs/45829964289) | 0 | 0 | 396 | 0 | 0 |
 
 The store now holds 396 articles / 1,335 chunks.
 
