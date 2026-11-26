@@ -9,6 +9,7 @@ file_search tool, then prints the answer and the chunk files it cited.
 from __future__ import annotations
 
 import os
+import re
 import sys
 
 from dotenv import load_dotenv
@@ -23,6 +24,12 @@ SYSTEM_PROMPT = """You are OptiBot, the customer-support bot for OptiSigns.com.
 • Cite up to 3 "Article URL:" lines per reply."""
 
 DEFAULT_MODEL = "gpt-6.2-astra"
+# Inline citation markers (\ue200filecite\ue202...\ue201) that UIs render as chips.
+CITATION_MARKER = re.compile("[ \t]*\ue200[^\ue201]*\ue201")
+
+
+def strip_citation_markers(text: str) -> str:
+    return CITATION_MARKER.sub("", text)
 
 
 def main() -> int:
@@ -40,7 +47,7 @@ def main() -> int:
         input=question,
         tools=[{"type": "file_search", "vector_store_ids": [store_id], "max_num_results": 8}],
     )
-    print(f"Q: {question}\n\n{response.output_text}\n")
+    print(f"Q: {question}\n\n{strip_citation_markers(response.output_text).strip()}\n")
     cited = []
     for item in response.output:
         for part in getattr(item, "content", None) or []:
