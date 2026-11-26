@@ -40,7 +40,7 @@ def chunk_attributes(art: LocalArticle, chunk: Chunk) -> dict:
     }
 
 
-def resolve_store(client, store_id: str | None, name: str) -> str:
+def find_store(client, store_id: str | None, name: str) -> str | None:
     if store_id:
         client.vector_stores.retrieve(store_id)  # fail fast on a wrong id
         return store_id
@@ -48,6 +48,12 @@ def resolve_store(client, store_id: str | None, name: str) -> str:
         if vs.name == name:
             log.info("Using vector store %s (%s)", vs.id, name)
             return vs.id
+    return None
+
+
+def resolve_store(client, store_id: str | None, name: str) -> str:
+    if found := find_store(client, store_id, name):
+        return found
     vs = client.vector_stores.create(name=name)
     log.info("Created vector store %s (%s) — set VECTOR_STORE_ID=%s to pin it", vs.id, name, vs.id)
     return vs.id

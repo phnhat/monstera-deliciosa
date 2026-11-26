@@ -1,0 +1,11 @@
+.env
+.venv
+.git
+.github
+out
+articles
+docs
+tests
+**/__pycache__
+.pytest_cache
+goal.md
