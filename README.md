@@ -64,7 +64,7 @@ Build image → Fetch articles → Convert to Markdown → Chunk → Compare wit
 
 The image is built once and handed to the later jobs. Phase outputs pass between jobs as artifacts. The workflow needs the repo secret `OPENAI_API_KEY` and the repo variable `VECTOR_STORE_ID`. GitHub pauses scheduled workflows in public repos after 60 days without commits.
 
-First runs (single-job workflow at the time): the initial backfill, then a demo of `updated`.
+Runs so far: the initial backfill, a demo of `updated`, then the first run of the 6-job workflow (nothing changed upstream, so everything was skipped). Runs 1–5 ran as a single job.
 
 | Run | added | updated | skipped | deferred | chunks embedded |
 |---|---|---|---|---|---|
@@ -73,6 +73,7 @@ First runs (single-job workflow at the time): the initial backfill, then a demo 
 | [3](https://github.com/phnhat/monstera-deliciosa/actions/runs/45816618603) | 100 | 0 | 200 | 96 | 277 |
 | [4](https://github.com/phnhat/monstera-deliciosa/actions/runs/45817204477) | 96 | 0 | 300 | 0 | 507 |
 | [5](https://github.com/phnhat/monstera-deliciosa/actions/runs/45817990308) (`mark_stale=3` demo) | 0 | 3 | 393 | 0 | 13 |
+| [6](https://github.com/phnhat/monstera-deliciosa/actions/runs/45829964289) (6-job workflow) | 0 | 0 | 396 | 0 | 0 |
 
 The store now holds 396 articles / 1,335 chunks.
 
