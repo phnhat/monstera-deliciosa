@@ -86,3 +86,7 @@ You are OptiBot, the customer-support bot for OptiSigns.com.
 • Max 5 bullet points; else link to the doc.
 • Cite up to 3 "Article URL:" lines per reply.
 ```
+
+![OptiBot in the OpenAI Playground answering "How do I add a YouTube video?"](docs/screenshot.png)
+
+OptiBot (`gpt-6.2-astra` + File Search on the `optibot-kb` store) answers the sample question and cites the article URL. The chunk files it used appear as chips below the answer. The small boxes after step 2 are the model's inline citation markers, which the Playground shows raw. `python ask.py "How do I add a YouTube video?"` gives the same answer from the command line with the markers stripped, as OpenAI's [citation formatting guide](https://developers.openai.com/api/docs/guides/citation-formatting) recommends.
