@@ -91,7 +91,7 @@ There are two fields here.
 - **First Field -** Enter the name of the key here. We recommend something that will help you remember it. You'll be using this to set up an API request.
 - **Second Field -** The actual unique passcode for your API communications.
 
-Once you've input your API Authorization token, hit **Save**. When you want to run a request using this API Key, you'll use the term: **{{apiKeystore.<<key>>}}** where "<<key>>" is replaced by the name you inserted earlier. In this example, we'll name our request "clover".
+Once you've input your API Authorization token, hit **Save**. When you want to run a request using this API Key, you'll use the term: **{{apiKeystore.<\<key>>}}** where "<\<key>>" is replaced by the name you inserted earlier. In this example, we'll name our request "clover".
 
 ![](https://support.optisigns.com/hc/article_attachments/32427378828051)
 
@@ -125,7 +125,7 @@ Click the **Add Request** button, it will launch the window for you to configure
 - **Enable this Request** - Set the status of the API request.
 - **Enable Static IP** -Allows you to route this request through a fixed IP for those APIs which require whitelisting on your organization's firewall. That IP is 178.128.134.248 - with this checked, you'll need to whitelist this IP.
 
-To test the request, we'll need to configure the header. This is where the Keystore comes in. In the second box, type **Bearer {{apiKeystore.<<key>>}}**, where *Bearer* is the type of token and *{{apiKeystore.<<key>>}}* pulls the token stored in the Keystore. In this example, we'll use the name "clover" as referenced above.
+To test the request, we'll need to configure the header. This is where the Keystore comes in. In the second box, type **Bearer {{apiKeystore.<\<key>>}}**, where *Bearer* is the type of token and *{{apiKeystore.<\<key>>}}* pulls the token stored in the Keystore. In this example, we'll use the name "clover" as referenced above.
 
 Once that's done, click **"Run Test"**. If the response code is 200, the API has returned data successfully. If there is any other code, there is an issue in the API Request.
 

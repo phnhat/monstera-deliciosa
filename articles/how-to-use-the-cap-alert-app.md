@@ -76,7 +76,7 @@ Click **Advanced** to expand the field and provide a slate of additional options
 
 ![Advanced expanded, showing lifecycle, tag, location and status options](https://support.optisigns.com/hc/article_attachments/55560059908499)
 
-- **Enable Lifecycle Handling** - When checked, it allows handling of CAP message lifecycle events including Update, Cancel, and All Clear messages. It does this by checking the <identifier> field. **This option is only applied when "Post to Webhook" is set as the Content Type**. It also enables the below options:
+- **Enable Lifecycle Handling** - When checked, it allows handling of CAP message lifecycle events including Update, Cancel, and All Clear messages. It does this by checking the \<identifier> field. **This option is only applied when "Post to Webhook" is set as the Content Type**. It also enables the below options:
 
 ![Enable Lifecycle Handling ticked, showing Handle All Clear, Update and Cancel](https://support.optisigns.com/hc/article_attachments/55560067041555)
 
@@ -86,10 +86,10 @@ Click **Advanced** to expand the field and provide a slate of additional options
 >
 > OptiSigns handles All Clear messages in this way:
 >
-> 1. First, it finds the <responseType> in the message:
+> 1. First, it finds the \<responseType> in the message:
 >
 >    `<responseType>AllClear</responseType>`
-> 2. Then, it checks the <expires>:
+> 2. Then, it checks the \<expires>:
 >
 >    `<expires>2027-01-31T11:23:46-05:00</expires>`
 > 3. If AllClear is noted in the response type, it will display the message **until the designated expires time**. If no time is sent, it will default to 60 seconds.
@@ -97,14 +97,14 @@ Click **Advanced** to expand the field and provide a slate of additional options
 - **Handle Update -** When enabled, the app will automatically refresh screens with additional information on the emergency alerts as updates become available.
 - **Handle Cancel** - When enabled, the app looks for a "Cancel" message referencing a previous alert. If detected, the emergency alert is immediately removed from your screens and normal content resumes.
 - **Item Duration** - How long each individual item in the CAP Alert feed will display.
-- **Title Tag** - Message title from the CAP/IPAWS message/RSS feed. Default is <headline> - you can change if your feed is different
-- **Description Tag** - Message content from the CAP/IPAWS message/RSS feed, default is <description> - you can change if your feed is different
+- **Title Tag** - Message title from the CAP/IPAWS message/RSS feed. Default is \<headline> - you can change if your feed is different
+- **Description Tag** - Message content from the CAP/IPAWS message/RSS feed, default is \<description> - you can change if your feed is different
 - **Location (Screen Tags)** - If you can match the screen tags with your location passed from the CAP/IPAWS message/RSS feed - you can use it to control the selection of the target screens. By default, it maps to the "areaDesc" attribute from the CAP alert.
 - **Status** - Select your CAP Alert status.
 
 > **IMPORTANT**
 >
-> A common issue we find is the screen displays a "No Content Available" message after users push out the CAP alert using the "aeraDesc" attribute. The solution: if you are not intending to use screen tags to map to location, try changing the Location value from "areaDesc" to any other value, like <areaDesc1>.
+> A common issue we find is the screen displays a "No Content Available" message after users push out the CAP alert using the "aeraDesc" attribute. The solution: if you are not intending to use screen tags to map to location, try changing the Location value from "areaDesc" to any other value, like \<areaDesc1>.
 
 ![Advanced filters for severity, certainty, urgency, category and codes](https://support.optisigns.com/hc/article_attachments/55560067043987)
 

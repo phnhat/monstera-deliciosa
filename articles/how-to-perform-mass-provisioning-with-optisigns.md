@@ -66,7 +66,7 @@ For now, set up the template in this popup:
 - Sync Play: Used to set the turn on/off of the sync play feature. For more details on the Sync Play feature, please click [here](https://support.optisigns.com/hc/en-us/articles/4412065189267-Synchronized-playback-Sync-Play-feature).
 - Location: Set the location of the device.
 
-Once the template is created, it will be available under the list of provisioning templates. Download the config file for use during deployment. The configuration file's name is "provisioning-template-<Your Template Name>.cfg"
+Once the template is created, it will be available under the list of provisioning templates. Download the config file for use during deployment. The configuration file's name is "provisioning-template-\<Your Template Name>.cfg"
 
 ![provisioning templates screen with arrow pointing at file name button](https://support.optisigns.com/hc/article_attachments/4416548298259)
 

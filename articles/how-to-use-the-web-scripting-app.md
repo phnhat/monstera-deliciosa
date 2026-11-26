@@ -115,11 +115,11 @@ If 2FA is enabled on your login, you'll need to obtain a **Secret Key**.
 
 To get this, click the "I Can't Scan the QR Code" button on your authenticator:
 
-![](/attachments/token/xOjvcQdIqA9avnfjpzeOZVRqG/?name=image.png)
+![](https://support.optisigns.com/attachments/token/xOjvcQdIqA9avnfjpzeOZVRqG/?name=image.png)
 
 It will provide you with a Secret Key:
 
-![](/attachments/token/0MBnE1wGrWf20KsUlRNDpncuK/?name=image.png)
+![](https://support.optisigns.com/attachments/token/0MBnE1wGrWf20KsUlRNDpncuK/?name=image.png)
 
 Copy this Secret Key for use later, then finish the 2FA process.
 

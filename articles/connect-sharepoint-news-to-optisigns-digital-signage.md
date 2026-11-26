@@ -133,7 +133,7 @@ Add either of these, depending on what your organization's policy allows:
 >
 > If you choose `Sites.Selected`, the permission alone is not enough — the application must also be granted access to the particular site you want to display, which your Microsoft administrator does per site. Without it, **Test Connection** reports that the Service Principal authenticated but has no access to that site.
 
-Still on **API permissions**, select **Grant admin consent for <your organization>**. The **Status** column must read **Granted** before the connection will work.
+Still on **API permissions**, select **Grant admin consent for \<your organization>**. The **Status** column must read **Granted** before the connection will work.
 
 ![Azure API permissions showing the Status column reading Granted for the organisation](https://support.optisigns.com/hc/article_attachments/55450665542419)
 

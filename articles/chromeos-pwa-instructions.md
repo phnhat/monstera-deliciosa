@@ -121,7 +121,7 @@ Once the template is created, it will be available under the list of provisionin
 
 ![adding chromeos to provisioning template](https://support.optisigns.com/hc/article_attachments/49039295552531)
 
-Your configuration file will be "provisionting-template-<Your Template Name>.txt".
+Your configuration file will be "provisionting-template-\<Your Template Name>.txt".
 
 This file contains a JSON object. This is what you will need to set up auto-provisioning in the next step.
 

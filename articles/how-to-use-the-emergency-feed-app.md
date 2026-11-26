@@ -76,9 +76,9 @@ Click **Advanced** to expand the field and provide a slate of additional options
 ![Advanced options: duration, title and description tags, location tag and content filters](https://support.optisigns.com/hc/article_attachments/55413672734355)
 
 - **Duration (seconds):** How long to display each feed item before moving on to the next.
-- **Title Tag:** Message title from the RSS XML feed. The default is <title> - you can change it if your feed is different
-- **Description Tag**: Message content from the RSS XML feed. The default is <description> - you can change it if your feed is different
-- **Location (Screen Tags):** Some RSS can pass locations tag (i.e. emergency in a certain location only). The default tag is <location> - you can change it if your feed is different
+- **Title Tag:** Message title from the RSS XML feed. The default is \<title> - you can change it if your feed is different
+- **Description Tag**: Message content from the RSS XML feed. The default is \<description> - you can change it if your feed is different
+- **Location (Screen Tags):** Some RSS can pass locations tag (i.e. emergency in a certain location only). The default tag is \<location> - you can change it if your feed is different
 - **Filter content containing:** Filter content based on specific words in the title or description (i.e. "fire"). If any title or description contains the word "fire" (case insensitive), the app will trigger the screen takeover.
 - **Exclude title containing:** this filter will only apply to the title. You can hide all the old feeds by filtering with specific words in the title. I.E: “All Clear”, so after the emergency is gone, all the feeds before this title will be hidden, then the screen will revert to the original content or just display the new content after that.
 

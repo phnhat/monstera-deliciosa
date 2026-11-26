@@ -127,11 +127,11 @@ Your permission is now listed, but look at the **Status** column:
 
 ![The permission list showing TeamworkDevice.Read.All with the status Not granted](https://support.optisigns.com/hc/article_attachments/54863338686867)
 
-**⚠ Not granted for <your tenant>.**
+**⚠ Not granted for \<your tenant>.**
 
 The permission has been *requested*, not *approved*. In this state Microsoft still issues OptiSigns an access token — it simply carries no privileges, so every attempt to read your rooms returns **403 Forbidden**. Nothing about the app registration looks broken; it just doesn't work.
 
-Click **✓ Grant admin consent for <your tenant>** and confirm.
+Click **✓ Grant admin consent for \<your tenant>** and confirm.
 
 > If that button is greyed out, your account isn't a **Global Administrator** or **Privileged Role Administrator**. You'll need someone who is — an app can't consent to itself.
 
@@ -141,7 +141,7 @@ Give it a moment, then check the **Status** column again. This is what correct l
 
 ![The permission list showing Granted for the tenant, with green check marks](https://support.optisigns.com/hc/article_attachments/54863338849811)
 
-A green banner reading **"Successfully granted admin consent for the requested permissions"**, and `TeamworkDevice.Read.All` showing **Granted for <your tenant>**.
+A green banner reading **"Successfully granted admin consent for the requested permissions"**, and `TeamworkDevice.Read.All` showing **Granted for \<your tenant>**.
 
 Don't move on until you see it. Consent takes about a minute to propagate.
 

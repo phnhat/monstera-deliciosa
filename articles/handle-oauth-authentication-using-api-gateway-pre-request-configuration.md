@@ -39,8 +39,8 @@ os.context.set("request.headers.authorization", token);
 **Notes:**
 
 - "grant_type": Use "client_credentials" ., because "client_credentials" is the grant type in OAuth for server-side integration without user interaction.
-- <CLIENT_ID> and <CLIENT_SECRET> refers to the user's code for the API being accessed, this will need to be provided by the user.
-- <OAUTH_AUTHENTICATION_URL> refers to the URL the access token is being retrieved from. This URL will need to be provided by the user.
+- \<CLIENT_ID> and \<CLIENT_SECRET> refers to the user's code for the API being accessed, this will need to be provided by the user.
+- \<OAUTH_AUTHENTICATION_URL> refers to the URL the access token is being retrieved from. This URL will need to be provided by the user.
 
 Now configure the **Header**:
 
