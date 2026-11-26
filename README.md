@@ -2,12 +2,14 @@
 
 Support-center articles → clean Markdown → OpenAI vector store, kept in sync by a daily job. It backs **OptiBot**, an assistant that answers only from the docs and cites article URLs.
 
-**Daily job logs:** [GitHub Actions runs](https://github.com/phnhat/monstera-deliciosa/actions/workflows/daily-sync.yml). Each run's summary shows added / updated / skipped counts, and its `kb-sync-run-N` artifact holds `run_report.json`, `sync.log`, the Markdown and the chunks.
+**Daily job logs:** [GitHub Actions runs](https://github.com/phnhat/monstera-deliciosa/actions/workflows/daily-sync.yml). Each run's summary shows added / updated / skipped counts. Its artifacts (`1-raw-articles` … `5-run-report`) hold each phase's output and log, ending with `run_report.json`.
 
 ## How it works
 1. **Scrape** (`kbsync/zendesk.py`): every published article via the Zendesk Help Center API. The API returns article bodies only, so site nav, headers, footers and ads never enter the pipeline.
 2. **Normalize** (`kbsync/convert.py`): HTML → Markdown with ATX headings, fenced code, tables and images. In-page `#anchor` links are rewritten to their heading slugs, embeds (YouTube, Canva) become links, one-column "TIP" tables become blockquotes, and inline styles are stripped. Output: [`articles/<slug>.md`](articles/), each starting with `# Title` and `Article URL: …`.
 3. **Chunk** (`kbsync/chunking.py`) and **sync** (`kbsync/sync.py`, `kbsync/vector_store.py`), described below.
+
+`kbsync/pipeline.py` runs these as five phases: `fetch → convert → chunk → plan → upload`. Each phase reads the previous phase's files from `out/`. `python main.py` runs all of them; `python main.py <phase>` runs one.
 
 ## Chunking strategy
 Heading-aware and done client-side:
@@ -42,6 +44,7 @@ pip install -r requirements-dev.txt
 cp .env.sample .env                      # add OPENAI_API_KEY
 python main.py --dry-run                 # scrape + convert + chunk, no API calls
 python main.py                           # sync the delta to the vector store
+python main.py fetch                     # or one phase: fetch|convert|chunk|plan|upload
 python ask.py "How do I add a YouTube video?"
 pytest -q
 ```
@@ -53,9 +56,15 @@ docker run --rm -e API_KEY=sk-... kbsync    # same as: kbsync main.py
 The image is a multi-stage build, from a `python:3.13-slim` builder to a `distroless/python3` runtime: 155 MB, no shell, non-root.
 
 ## Daily job
-`.github/workflows/daily-sync.yml` builds the image and runs it daily at 06:17 UTC, plus manual runs. It needs the repo secret `OPENAI_API_KEY` and the repo variable `VECTOR_STORE_ID`. GitHub pauses scheduled workflows in public repos after 60 days without commits.
+`.github/workflows/daily-sync.yml` runs daily at 06:17 UTC, plus manual runs. Each phase is its own job, so the run graph shows which phase failed and how long each took:
 
-First runs: the initial backfill, then a demo of `updated`.
+```
+Build image → Fetch articles → Convert to Markdown → Chunk → Compare with vector store → Upload delta
+```
+
+The image is built once and handed to the later jobs. Phase outputs pass between jobs as artifacts. The workflow needs the repo secret `OPENAI_API_KEY` and the repo variable `VECTOR_STORE_ID`. GitHub pauses scheduled workflows in public repos after 60 days without commits.
+
+First runs (single-job workflow at the time): the initial backfill, then a demo of `updated`.
 
 | Run | added | updated | skipped | deferred | chunks embedded |
 |---|---|---|---|---|---|
