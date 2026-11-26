@@ -19,6 +19,8 @@ Detail behind the [README](../README.md).
 - In-page `#anchor` links are rewritten to their heading slugs (1,366 of 1,373 resolve; the other 7 point at anchors missing in the source).
 - Embeds (YouTube, Canva) become links, and one-column "TIP" tables become blockquotes.
 - Inline styles, spans and decorative rules are stripped.
+- Site-relative image sources (`/attachments/…`) are resolved against the help-center host so images render anywhere; link hrefs are kept verbatim.
+- A literal `<` that starts a tag-like word in plain text (`<your tenant>`, an `<iframe>` example) is escaped as `\<`. Otherwise Markdown renderers treat it as HTML and drop it.
 
 Each file starts with `# Title` and `Article URL: …`.
 
@@ -60,7 +62,7 @@ Build image → Fetch articles → Convert to Markdown → Chunk → Compare wit
 
 The phases take seconds each and run strictly in order, so they are steps rather than separate jobs: no per-job runner start-up, and no passing the image between machines. A 6-job version took 137 s per run; this one takes ~50 s. The workflow needs the repo secret `OPENAI_API_KEY` and the repo variable `VECTOR_STORE_ID`. GitHub pauses scheduled workflows in public repos after 60 days without commits.
 
-Runs so far: the initial backfill, a demo of `updated`, then a run where nothing had changed upstream, so everything was skipped.
+Runs so far: the initial backfill, a demo of `updated`, a run where nothing had changed upstream (everything skipped), and a real update after a converter fix changed 13 articles.
 
 | Run | added | updated | skipped | deferred | chunks embedded |
 |---|---|---|---|---|---|
@@ -70,6 +72,7 @@ Runs so far: the initial backfill, a demo of `updated`, then a run where nothing
 | [4](https://github.com/phnhat/monstera-deliciosa/actions/runs/45817204477) | 96 | 0 | 300 | 0 | 507 |
 | [5](https://github.com/phnhat/monstera-deliciosa/actions/runs/45817990308) (`mark_stale=3` demo) | 0 | 3 | 393 | 0 | 13 |
 | [6](https://github.com/phnhat/monstera-deliciosa/actions/runs/45829964289) | 0 | 0 | 396 | 0 | 0 |
+| [7](https://github.com/phnhat/monstera-deliciosa/actions/runs/45846198443) (converter fix, no demo) | 0 | 13 | 383 | 0 | 68 |
 
 The store holds 396 articles / 1,335 chunks.
 
