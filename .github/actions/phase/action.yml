@@ -1,0 +1,42 @@
+name: Run pipeline phase
+description: Load the image built by the build job and run one main.py phase with ./out mounted.
+
+inputs:
+  args:
+    description: "main.py arguments, e.g. 'fetch' or 'plan --mark-stale 3'"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Download image
+      uses: actions/download-artifact@v8
+      with:
+        name: docker-image
+        path: ${{ runner.temp }}/image
+
+    - name: Load image
+      shell: bash
+      run: docker load --input "$RUNNER_TEMP/image/kbsync.tar.gz"
+
+    - name: Run main.py ${{ inputs.args }}
+      shell: bash
+      env:
+        ARGS: ${{ inputs.args }}
+      run: |
+        mkdir -p out && chmod -R a+rwX out   # container runs as non-root (uid 65532)
+        docker run --rm \
+          -e OPENAI_API_KEY -e VECTOR_STORE_ID -e MAX_NEW_PER_RUN \
+          -e OUTPUT_DIR=/app/out/articles \
+          -e GITHUB_STEP_SUMMARY=/app/out/.step_summary.md \
+          -v "$PWD/out:/app/out" \
+          kbsync main.py $ARGS
+
+    - name: Publish phase summary
+      if: always()
+      shell: bash
+      run: |
+        if [ -f out/.step_summary.md ]; then
+          cat out/.step_summary.md >> "$GITHUB_STEP_SUMMARY"
+          rm out/.step_summary.md
+        fi
