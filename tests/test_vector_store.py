@@ -81,7 +81,7 @@ def test_update_uploads_new_chunks_before_deleting_old_ones():
     deleted = {c[1] for c in client.calls if c[0] == "vs.delete"}
     assert deleted == {"file-old-2-0", "file-old-2-1"}
     assert result.updated == [2] and result.failed == {}
-    assert result.files_uploaded == 2 and result.files_deleted == 2
+    assert result.files_uploaded == 2 and result.files_deleted == 2 and result.files_retired == 2
 
 
 def test_failed_upload_keeps_old_version_and_cleans_partial_new_files():
@@ -97,12 +97,14 @@ def test_failed_upload_keeps_old_version_and_cleans_partial_new_files():
     assert not any(fid.startswith("file-old-2") for fid in vs_deleted)  # old version still served
     new_bad = {fid for fid, name in client.names.items() if name.startswith("bad__")}
     assert new_bad <= vs_deleted  # partial new upload removed
+    assert result.files_retired == 0  # nothing that was live got removed
 
 
 def test_removed_articles_delete_all_their_files():
     client = FakeClient()
     result = apply_delta(Store(client, "vs_1", workers=1), Delta(removed=[(9, old_files(9, n=3))]))
     assert result.removed == [9]
+    assert result.files_retired == 3
     assert sorted(c[1] for c in client.calls if c[0] == "files.delete") == [f"file-old-9-{i}" for i in range(3)]
 
 

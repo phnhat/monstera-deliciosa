@@ -36,7 +36,7 @@ def setup_logging(out_dir: Path) -> None:
     for handler in (logging.StreamHandler(sys.stdout), logging.FileHandler(out_dir / "sync.log", mode="w")):
         handler.setFormatter(fmt)
         root.addHandler(handler)
-    for noisy in ("httpx", "openai", "urllib3"):
+    for noisy in ("httpx", "httpx2", "httpcore", "httpcore2", "openai", "urllib3"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
 
@@ -117,7 +117,8 @@ def run(cfg: Config, dry_run: bool, mark_stale: int) -> int:
             md_files_embedded=len(result.added) + len(result.updated),
             chunks_embedded=result.files_uploaded,
             store_articles=len(groups) + len(result.added) - len(result.removed),
-            store_chunks=store.file_count(),
+            # computed, not read back: the API's file_counts lag behind deletions for a few seconds
+            store_chunks=sum(map(len, groups.values())) + result.files_uploaded - result.files_retired,
         )
         report.details = {
             "added": [slug[i] for i in result.added],

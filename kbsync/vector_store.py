@@ -67,6 +67,7 @@ class ApplyResult:
     failed: dict[int, str] = field(default_factory=dict)
     files_uploaded: int = 0
     files_deleted: int = 0
+    files_retired: int = 0  # previously live files removed (old versions + removed articles)
 
 
 class Store:
@@ -78,9 +79,6 @@ class Store:
     # --- reads -----------------------------------------------------------------
     def list_files(self) -> list:
         return list(self.client.vector_stores.files.list(vector_store_id=self.id, limit=100))
-
-    def file_count(self) -> int:
-        return self.client.vector_stores.retrieve(self.id).file_counts.completed
 
     # --- writes ----------------------------------------------------------------
     def upload(self, arts: list[LocalArticle]) -> tuple[set[int], dict[int, str], dict[int, list[str]]]:
@@ -170,8 +168,9 @@ def apply_delta(store: Store, delta: Delta) -> ApplyResult:
     # successfully updated ones, then drop articles that disappeared upstream.
     result.files_deleted += store.delete([fid for aid in failed for fid in new_ids.get(aid, [])])
     retired = [f.file_id for art, files in delta.updated if art.article.id in ok for f in files]
-    result.files_deleted += store.delete(retired)
-    result.files_deleted += store.delete([f.file_id for _, files in delta.removed for f in files])
+    retired += [f.file_id for _, files in delta.removed for f in files]
+    result.files_retired = store.delete(retired)
+    result.files_deleted += result.files_retired
 
     result.added = [a.article.id for a in delta.added if a.article.id in ok]
     result.updated = [a.article.id for a, _ in delta.updated if a.article.id in ok]
