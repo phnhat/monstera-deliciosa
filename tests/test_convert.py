@@ -5,6 +5,10 @@ def md(html: str, title: str | None = None) -> str:
     return body_to_markdown(html, title=title)
 
 
+def md_with_base(html: str) -> str:
+    return body_to_markdown(html, base_url="https://support.optisigns.com")
+
+
 # --- slugs -------------------------------------------------------------------
 
 def test_article_slug_strips_numeric_id_and_lowercases():
@@ -90,6 +94,33 @@ def test_absolute_relative_and_mailto_links_are_preserved_verbatim():
     assert "[Billing](https://support.optisigns.com/hc/en-us/articles/360041587014#View)" in out
     assert "[Rel](/hc/en-us/articles/123)" in out
     assert "[mail](mailto:support@optisigns.com)" in out
+
+
+def test_site_relative_images_resolve_against_the_help_center():
+    html = '<p><img src="/attachments/token/IZoa/?name=inline.png" alt="Upload"></p>'
+    out = md_with_base(html)
+    assert out.strip() == "![Upload](https://support.optisigns.com/attachments/token/IZoa/?name=inline.png)"
+
+
+def test_render_article_resolves_images_using_the_article_host():
+    art = Article(id=1, title="T", url="https://support.optisigns.com/hc/en-us/articles/1-T",
+                  updated_at="", body_html='<img src="/attachments/token/x/?name=a.png" alt="">')
+    assert "![](https://support.optisigns.com/attachments/token/x/?name=a.png)" in render_article(art)
+
+
+def test_literal_tag_like_text_is_escaped_so_renderers_keep_it():
+    html = ('<p>Grant admin consent for &lt;your tenant&gt;.</p>'
+            '<p>Paste &lt;iframe src="https://x"&gt;&lt;/iframe&gt; into the page.</p>'
+            '<p>Use {{apiKeystore.&lt;&lt;key&gt;&gt;}} and note that 1 &lt; 2.</p>')
+    out = md(html)
+    assert "Grant admin consent for \\<your tenant>." in out
+    assert 'Paste \\<iframe src="https://x">\\</iframe> into the page.' in out
+    assert "{{apiKeystore.<\\<key>>}}" in out and "1 < 2" in out
+
+
+def test_angle_brackets_inside_code_are_not_escaped():
+    out = md("<p>Use <code>&lt;div&gt;</code></p><pre><code>&lt;iframe&gt;</code></pre>")
+    assert "`<div>`" in out and "```\n<iframe>\n```" in out
 
 
 def test_images_are_kept_with_alt_text():

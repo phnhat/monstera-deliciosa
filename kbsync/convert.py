@@ -30,6 +30,7 @@ ALLOWED_ATTRS = {
     "th": ("colspan", "rowspan"),
 }
 NO_LANGUAGE = {"auto", "plaintext", "text", "none"}
+TAG_LIKE = re.compile(r"<(?=[A-Za-z/!?])")
 ZERO_WIDTH = dict.fromkeys(map(ord, "​‌‍﻿"), None)
 
 
@@ -72,11 +73,15 @@ class _Slugger:
 
 
 def render_article(article: Article) -> str:
-    body = body_to_markdown(article.body_html, title=article.title)
+    origin = urlparse(article.url)
+    base_url = f"{origin.scheme}://{origin.netloc}" if origin.netloc else None
+    body = body_to_markdown(article.body_html, title=article.title, base_url=base_url)
     return f"# {article.title}\n\nArticle URL: {article.url}\n\n{body}"
 
 
-def body_to_markdown(body_html: str, title: str | None = None) -> str:
+def body_to_markdown(body_html: str, title: str | None = None, base_url: str | None = None) -> str:
+    """base_url (e.g. https://support.optisigns.com) resolves site-relative image
+    sources so images still render outside the help center; link hrefs are kept as-is."""
     soup = BeautifulSoup(body_html or "", "html.parser")
     slugger = _Slugger()
     if title:
@@ -84,6 +89,7 @@ def body_to_markdown(body_html: str, title: str | None = None) -> str:
 
     _drop_noise(soup)
     _embeds_to_links(soup)
+    _absolutize_images(soup, base_url)
     _resolve_anchors(soup, slugger)
     _callout_tables_to_blockquotes(soup)
     for tag in soup.find_all(UNWRAP_TAGS):
@@ -91,7 +97,7 @@ def body_to_markdown(body_html: str, title: str | None = None) -> str:
     _strip_attributes(soup)
     _drop_empty_blocks(soup)
 
-    text = MarkdownConverter(
+    text = _Converter(
         heading_style="ATX",
         bullets="-",
         escape_underscores=False,
@@ -101,6 +107,15 @@ def body_to_markdown(body_html: str, title: str | None = None) -> str:
         code_language_callback=_code_language,
     ).convert_soup(soup)
     return _normalize_whitespace(text)
+
+
+class _Converter(MarkdownConverter):
+    """Backslash-escape a literal `<` that starts a tag-like word in plain text
+    (`<your tenant>`, `<iframe ...>`), so Markdown renderers show it instead of
+    treating it as HTML and dropping it. Code spans and blocks are never escaped."""
+
+    def escape(self, text, parent_tags):
+        return TAG_LIKE.sub(r"\\<", super().escape(text, parent_tags))
 
 
 # --- pre-clean steps ----------------------------------------------------------
@@ -114,6 +129,15 @@ def _drop_noise(soup: BeautifulSoup) -> None:
         hr.decompose()
     for br in soup.select("pre br"):
         br.replace_with("\n")
+
+
+def _absolutize_images(soup: BeautifulSoup, base_url: str | None) -> None:
+    for img in soup.find_all("img", src=True):
+        src = img["src"]
+        if src.startswith("//"):
+            img["src"] = "https:" + src
+        elif src.startswith("/") and base_url:
+            img["src"] = base_url.rstrip("/") + src
 
 
 def _embed_target(src: str) -> tuple[str, str | None]:
