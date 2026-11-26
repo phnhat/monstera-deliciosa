@@ -23,7 +23,7 @@ SYSTEM_PROMPT = """You are OptiBot, the customer-support bot for OptiSigns.com.
 • Max 5 bullet points; else link to the doc.
 • Cite up to 3 "Article URL:" lines per reply."""
 
-DEFAULT_MODEL = "gpt-6.2-astra"
+DEFAULT_MODEL = "gpt-5.5"  # newer gpt-6.x models emit raw inline citation markers in the Playground
 # Inline citation markers (\ue200filecite\ue202...\ue201) that UIs render as chips.
 CITATION_MARKER = re.compile("[ \t]*\ue200[^\ue201]*\ue201")
 
