@@ -54,7 +54,7 @@ Two controls help demonstrate the job:
 The image is a multi-stage build: a `python:3.13-slim` builder installs the dependencies, and a `gcr.io/distroless/python3-debian13:nonroot` runtime runs them. It is 155 MB (down from 280 MB single-stage), with no shell and no pip, running as non-root. `docker run IMAGE` runs every phase once and exits (0 on success).
 
 ## Daily job
-`.github/workflows/daily-sync.yml` runs daily at 06:17 UTC, plus manual runs. It is one job with one step per phase, so the run view shows which phase failed and how long each took:
+`.github/workflows/daily-sync.yml` runs daily at 02:23 UTC, plus manual runs. It is one job with one step per phase, so the run view shows which phase failed and how long each took:
 
 ```
 Build image → Fetch articles → Convert to Markdown → Chunk → Compare with vector store → Upload delta
