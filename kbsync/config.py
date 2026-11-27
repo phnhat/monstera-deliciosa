@@ -32,5 +32,5 @@ class Config:
             help_center_url=os.getenv("HELP_CENTER_URL") or "https://support.optisigns.com",
             articles_dir=Path(os.getenv("OUTPUT_DIR") or "articles"),
             out_dir=Path(os.getenv("OUT_DIR") or "out"),
-            max_new_per_run=_int("MAX_NEW_PER_RUN", 100),
+            max_new_per_run=_int("MAX_NEW_PER_RUN", 0),
         )

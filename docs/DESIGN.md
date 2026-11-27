@@ -47,7 +47,7 @@ State lives on the vector-store files themselves, as attributes (`article_id`, `
 Hashing content instead of trusting `updated_at` matters here: in one day the help center bumped `updated_at` on 384 of its 396 articles.
 
 Two controls help demonstrate the job:
-- `MAX_NEW_PER_RUN` (default 100) throttles the initial backfill.
+- `MAX_NEW_PER_RUN` throttles the initial backfill. The daily job sets it to 100; locally and in Docker it defaults to 0 (unlimited), so one run loads every article.
 - `--mark-stale N` (also an input on manual runs) is a demo switch. It marks N articles stale so a run shows `updated`, and the run log labels it as a demo.
 
 ## Docker
